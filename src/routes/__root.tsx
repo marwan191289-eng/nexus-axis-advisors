@@ -9,24 +9,26 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { WhatsAppFab } from "@/components/WhatsAppFab";
+import { SITE } from "@/lib/site";
 
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
+        <div className="serif text-8xl gold-text">404</div>
+        <h2 className="mt-4 serif text-2xl text-ink">Page not found</h2>
         <p className="mt-2 text-sm text-muted-foreground">
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Go home
-          </Link>
-        </div>
+        <Link
+          to="/"
+          className="mt-6 inline-block bg-ink text-bone px-6 py-3 text-xs uppercase tracking-[0.22em] hover:bg-accent hover:text-ink transition"
+        >
+          Return Home
+        </Link>
       </div>
     </div>
   );
@@ -35,30 +37,21 @@ function NotFoundComponent() {
 function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   console.error(error);
   const router = useRouter();
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
+        <h1 className="serif text-2xl text-ink">This page didn't load</h1>
         <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
+          Something went wrong. Please try again or return to the homepage.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() => { router.invalidate(); reset(); }}
+            className="bg-ink text-bone px-5 py-2.5 text-xs uppercase tracking-[0.22em]"
           >
             Try again
           </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
+          <a href="/" className="border border-border px-5 py-2.5 text-xs uppercase tracking-[0.22em]">
             Go home
           </a>
         </div>
@@ -72,19 +65,49 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: `${SITE.name} | ${SITE.tagline}` },
+      { name: "description", content: SITE.description },
+      { name: "author", content: SITE.name },
+      { name: "keywords", content: "UAE law firm, corporate law Dubai, commercial litigation, corporate tax UAE, HR consultancy, business setup, Golden Visa, legal consultants Ajman, Nexus Axis" },
+      { name: "theme-color", content: "#0a1226" },
+      { property: "og:site_name", content: SITE.name },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { property: "og:title", content: `${SITE.name} | ${SITE.tagline}` },
+      { property: "og:description", content: SITE.description },
+      { property: "og:locale", content: "en_US" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: SITE.name },
+      { name: "twitter:description", content: SITE.description },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
+      },
+    ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LegalService",
+          name: SITE.name,
+          description: SITE.description,
+          telephone: SITE.phone,
+          email: SITE.emails.info,
+          address: SITE.offices.map((o) => ({
+            "@type": "PostalAddress",
+            addressCountry: o.country,
+            addressLocality: o.city,
+            streetAddress: o.address,
+          })),
+          areaServed: ["AE", "EG", "GCC"],
+        }),
       },
     ],
   }),
@@ -97,9 +120,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
+      <head><HeadContent /></head>
       <body>
         {children}
         <Scripts />
@@ -110,10 +131,14 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <div className="flex flex-col min-h-screen">
+        <SiteHeader />
+        <main className="flex-1"><Outlet /></main>
+        <SiteFooter />
+        <WhatsAppFab />
+      </div>
     </QueryClientProvider>
   );
 }
